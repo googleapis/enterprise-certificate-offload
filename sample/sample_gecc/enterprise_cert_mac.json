@@ -1,0 +1,10 @@
+{
+    "cert_info": {
+        "issuer": "Google Endpoint Verification"
+    },
+    "libs": {
+        "signer_binary": "",
+        "offload_library": "",
+        "signer_library": ""
+    }
+}

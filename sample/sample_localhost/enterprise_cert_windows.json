@@ -1,0 +1,12 @@
+{
+    "cert_info": {
+        "issuer": "CertReq Test Root",
+        "provider": "current_user",
+        "store": "MY"
+    },
+    "libs": {
+        "signer_binary": "C:\\workspace\\corp\\tls_offload\\sample\\binaries\\signer.exe",
+        "offload_library": "C:\\workspace\\corp\\tls_offload\\build\\offload_win64.dll",
+        "signer_library": "C:\\workspace\\corp\\tls_offload\\sample\\binaries\\signer_win64.dll"
+    }
+}
