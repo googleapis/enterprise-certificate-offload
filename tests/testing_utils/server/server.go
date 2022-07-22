@@ -20,7 +20,7 @@ func main() {
 	http.HandleFunc("/foo", printMessage)
 
 	// CA cert
-	caCert, err := ioutil.ReadFile("./testing_utils/cert/ca_cert.pem")
+	caCert, err := ioutil.ReadFile("./tests/testing_utils/cert/ca_cert.pem")
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -39,5 +39,5 @@ func main() {
 		TLSConfig: config,
 	}
 	// Use server side cert and key
-	log.Fatal(server.ListenAndServeTLS("./testing_utils/cert/rsa_cert.pem", "./testing_utils/cert/rsa_key.pem"))
+	log.Fatal(server.ListenAndServeTLS("./tests/testing_utils/cert/rsa_cert.pem", "./tests/testing_utils/cert/rsa_key.pem"))
 }

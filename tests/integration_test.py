@@ -12,7 +12,7 @@ from unittest import mock
 faulthandler.enable()
 
 tests_folder_path = os.path.dirname(os.path.abspath(__file__))
-cert_folder = os.path.join(tests_folder_path, os.pardir, "testing_utils", "cert")
+cert_folder = os.path.join(tests_folder_path, "testing_utils", "cert")
 
 # Handling certificates and keys.
 ca_cert_file = os.path.join(cert_folder, "ca_cert.pem")
@@ -64,13 +64,7 @@ def get_sign_callback(key_path):
 
     return google.auth.transport._custom_tls_signer.SIGN_CALLBACK_CTYPE(sign_callback)
 
-if platform == "win32":
-    enterprise_cert_json = utils.generate_win_enterprise_cert_json()
-elif platform == "darwin":
-    enterprise_cert_json = utils.generate_mac_enterprise_cert_json()
-else:
-    enterprise_cert_json = utils.generate_linux_enterprise_cert_json()
-enterprise_cert_tmp_file = utils.write_enterprise_cert_json(enterprise_cert_json)
+enterprise_cert_tmp_file = utils.generate_enterprise_cert_file("dummy issuer")
 
 def run(cert, key_path):
     with mock.patch("google.auth.transport._custom_tls_signer.get_cert") as get_cert_mock:

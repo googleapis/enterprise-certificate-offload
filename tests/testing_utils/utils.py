@@ -1,14 +1,18 @@
 import json
 import os
 
+from sys import platform
 from tempfile import NamedTemporaryFile
 
 testing_utils_folder_path = os.path.dirname(os.path.abspath(__file__))
 signer_binaries_folder = os.path.join(testing_utils_folder_path, "signer_binaries")
-build_folder = os.path.join(testing_utils_folder_path, os.pardir, "build")
+build_folder = os.path.join(testing_utils_folder_path, os.pardir, os.pardir, "build")
 
-def generate_mac_enterprise_cert_json():
-    cert_info = { "issuer" : "not used" }
+def _generate_mac_enterprise_cert_json(issuer):
+    if issuer is None:
+        issuer = "Google Endpoint Verification"
+
+    cert_info = { "issuer" : issuer }
 
     libs = {
         "signer_binary": os.path.join(signer_binaries_folder, "mac64", "signer"),
@@ -24,16 +28,25 @@ def generate_mac_enterprise_cert_json():
 
     return json.dumps(enterprise_cert_dict)
 
-def generate_win_enterprise_cert_json():
+def _generate_win_enterprise_cert_json(issuer):
     return ""
 
-def generate_linux_enterprise_cert_json():
+def _generate_linux_enterprise_cert_json(issuer):
     return ""
 
-def write_enterprise_cert_json(contents):
+def _write_enterprise_cert_json(contents):
     tmp_file = NamedTemporaryFile(delete=True)
     with open(tmp_file.name, "w") as f:
         f.write(contents)
 
     return tmp_file
+
+def generate_enterprise_cert_file(issuer = None):
+    if platform == "win32":
+        enterprise_cert_json = _generate_win_enterprise_cert_json(issuer)
+    elif platform == "darwin":
+        enterprise_cert_json = _generate_mac_enterprise_cert_json(issuer)
+    else:
+        enterprise_cert_json = _generate_linux_enterprise_cert_json(issuer)
+    return _write_enterprise_cert_json(enterprise_cert_json)
     
