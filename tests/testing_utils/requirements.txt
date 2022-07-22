@@ -1,0 +1,5 @@
+cryptography==36.0.2
+requests
+pyopenssl
+pytest
+google-auth
