@@ -24,9 +24,16 @@
 # Executables
 *.out
 *.app
+*.exe
 
 # Python
 .python-version
 **/__pycache__/*
 test/integration/*sponge_log.xml
 test/integration/*.pyc
+
+# Build folder
+build
+
+# Test Binaries folder
+tests/testing_utils/signer_binaries
