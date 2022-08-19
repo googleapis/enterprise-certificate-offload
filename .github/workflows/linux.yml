@@ -11,8 +11,8 @@ jobs:
   build:
     runs-on: ubuntu-20.04
     steps:
+    - name: Install Dependencies
+      run: sudo apt update && sudo apt install -y cmake
     - uses: actions/checkout@v3
-
     - name: Build
-      # TODO: Split these into separate lines.
-      run: sudo apt update && sudo apt install -y cmake && cmake -S . -B build && cmake --build build
+      run: cmake -S . -B build && cmake --build build
