@@ -31,6 +31,7 @@
 **/__pycache__/*
 test/integration/*sponge_log.xml
 test/integration/*.pyc
+env/
 
 # Build folder
 build
@@ -53,3 +54,5 @@ CTestTestfile.cmake
 _deps
 Footer
 
+# Misc
+local_mtls_server_logs.txt
