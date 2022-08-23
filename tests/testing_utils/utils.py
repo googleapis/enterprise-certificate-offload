@@ -36,7 +36,24 @@ def _generate_win_enterprise_cert_json(issuer):
     return ""
 
 def _generate_linux_enterprise_cert_json(issuer):
-    return ""
+    if issuer is None:
+        issuer = "Google Endpoint Verification"
+
+    cert_info = { "issuer" : issuer }
+
+    libs = {
+        "signer_binary": os.path.join(signer_binaries_folder, "linux64", "signer"),
+        "signer_library": os.path.join(signer_binaries_folder, "linux64", "signer.so"),
+        "offload_library": os.path.join(build_folder, "libcertificate_offload.so")
+    }
+
+    enterprise_cert_dict = {
+        "cert_info": cert_info,
+        "libs": libs,
+        "version": "1"
+    }
+
+    return json.dumps(enterprise_cert_dict)
 
 def _write_enterprise_cert_json(contents):
     tmp_file = NamedTemporaryFile(delete=True)
