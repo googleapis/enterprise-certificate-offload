@@ -21,7 +21,7 @@ def _generate_mac_enterprise_cert_json(issuer):
     libs = {
         "signer_binary": os.path.join(signer_binaries_folder, "mac64", "signer"),
         "signer_library": os.path.join(signer_binaries_folder, "mac64", "signer.dylib"),
-        "offload_library": os.path.join(build_folder, "offload_mac64.dylib")
+        "offload_library": os.path.join(build_folder, "libcertificate_offload.dylib")
     }
 
     enterprise_cert_dict = {
