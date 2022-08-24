@@ -6,16 +6,19 @@ on:
     branches: [ main ]
 
 jobs:
-  build:
-    name: MacOS Build
+  CI:
     runs-on: macos-latest
-
     steps:
+      - uses: actions/setup-python@v4
+        with:
+          python-version: '3.8'
       - name: Checkout
         uses: actions/checkout@v1
-
       - name: Install Dependencies
         run: brew update && brew install cmake openssl@1.1
-
       - name: Build Library
         run: OPENSSL_ROOT_DIR="$(brew --prefix openssl@1.1)" cmake -S . -B build  && cmake --build build
+      - name: Set up Signer Proxy Binaries
+        run: ./scripts/setup_signer_proxy.sh
+      - name: Integration Test
+        run: ./scripts/integration_test.sh
