@@ -420,6 +420,18 @@ extern "C"
 #endif
         int ConfigureSslContext(SignFunc sign_func, const char *cert,
                                 SSL_CTX *ctx) {
+  if (!sign_func) {
+    return 0;
+  }
+
+  if (!cert) {
+    return 0;
+  }
+
+  if (!ctx) {
+    return 0;
+  }
+
   ENGINE *custom_engine = CreateEngineOnceGlobally();
   if (!custom_engine) {
     LogInfo("failed to create engine");
