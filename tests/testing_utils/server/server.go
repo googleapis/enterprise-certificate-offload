@@ -35,6 +35,7 @@ func main() {
 	config := &tls.Config{
 		ClientAuth: tls.RequireAndVerifyClientCert,
 		ClientCAs:  caCertPool,
+		MinVersion: tls.VersionTLS13,
 	}
 	config.BuildNameToCertificate()
 
