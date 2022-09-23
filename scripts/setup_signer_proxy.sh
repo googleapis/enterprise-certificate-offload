@@ -24,16 +24,16 @@ function set_up_env() {
   if [[ "$(uname)" == 'Linux' ]]; then
      BUILD_SCRIPT="build/scripts/linux_amd64.sh"
      SIGNER_BINARY="build/bin/linux_amd64/signer"
-     SIGNER_SHARED_LIB="build/bin/linux_amd64/signer.so"
+     SIGNER_SHARED_LIB="build/bin/linux_amd64/libsigner.so"
      TEST_BINARY_FOLDER="$PWD/tests/testing_utils/signer_binaries/linux64"
   elif [[ "$(uname)" == 'Darwin' ]]; then
      BUILD_SCRIPT="build/scripts/darwin_amd64.sh"
      SIGNER_BINARY="build/bin/darwin_amd64/signer"
-     SIGNER_SHARED_LIB="build/bin/darwin_amd64/signer.dylib"
+     SIGNER_SHARED_LIB="build/bin/darwin_amd64/libsigner.dylib"
      TEST_BINARY_FOLDER="$PWD/tests/testing_utils/signer_binaries/mac64"
   else
     echo "This script only supports Linux and MacOS."
-    exit 1 
+    exit 1
   fi
 }
 
