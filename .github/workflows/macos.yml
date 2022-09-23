@@ -21,6 +21,6 @@ jobs:
       - name: Unit Test
         run: ./build/offload_unit_test
       - name: Set up Signer Proxy Binaries
-        run: echo "Using go version: $(go version)" ./scripts/setup_signer_proxy.sh
+        run: echo "Using go version: $(go version)" && ./scripts/setup_signer_proxy.sh
       - name: Integration Test
         run: ./scripts/integration_test.sh
