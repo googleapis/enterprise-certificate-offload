@@ -17,8 +17,8 @@ def _generate_mac_enterprise_cert_json(issuer):
         issuer = "Google Endpoint Verification"
 
     libs = {
-        "signer_binary": os.path.join(signer_binaries_folder, "mac64", "signer"),
-        "signer_library": os.path.join(signer_binaries_folder, "mac64", "libsigner.dylib"),
+        "signer_binary": os.path.join(signer_binaries_folder, "mac64", "ecp"),
+        "signer_library": os.path.join(signer_binaries_folder, "mac64", "libecp.dylib"),
         "offload_library": os.path.join(build_folder, "libtls_offload.dylib")
     }
 
@@ -38,8 +38,8 @@ def _generate_linux_enterprise_cert_json(issuer):
         issuer = "Google Endpoint Verification"
 
     libs = {
-        "signer_binary": os.path.join(signer_binaries_folder, "linux64", "signer"),
-        "signer_library": os.path.join(signer_binaries_folder, "linux64", "libsigner.so"),
+        "signer_binary": os.path.join(signer_binaries_folder, "linux64", "ecp"),
+        "signer_library": os.path.join(signer_binaries_folder, "linux64", "libecp.so"),
         "offload_library": os.path.join(build_folder, "libtls_offload.so")
     }
 
