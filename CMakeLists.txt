@@ -23,11 +23,11 @@ set(CMAKE_CXX_STANDARD_REQUIRED True)
 
 find_package(OpenSSL 1.1.1 EXACT REQUIRED)
 
-add_library(certificate_offload SHARED
+add_library(tls_offload SHARED
   src/offload.cpp
 )
 
-target_link_libraries(certificate_offload OpenSSL::Crypto OpenSSL::SSL)
+target_link_libraries(tls_offload OpenSSL::Crypto OpenSSL::SSL)
 
 if (ENABLE_UNIT_TESTS)
   include(FetchContent)
@@ -48,7 +48,7 @@ if (ENABLE_UNIT_TESTS)
   target_link_libraries(
     offload_unit_test
     GTest::gtest_main
-    certificate_offload
+    tls_offload
   )
 
   include(GoogleTest)

@@ -16,16 +16,14 @@ def _generate_mac_enterprise_cert_json(issuer):
     if issuer is None:
         issuer = "Google Endpoint Verification"
 
-    cert_info = { "issuer" : issuer }
-
     libs = {
-        "signer_binary": os.path.join(signer_binaries_folder, "mac64", "signer"),
-        "signer_library": os.path.join(signer_binaries_folder, "mac64", "signer.dylib"),
-        "offload_library": os.path.join(build_folder, "libcertificate_offload.dylib")
+        "signer_binary": os.path.join(signer_binaries_folder, "mac64", "ecp"),
+        "signer_library": os.path.join(signer_binaries_folder, "mac64", "libecp.dylib"),
+        "offload_library": os.path.join(build_folder, "libtls_offload.dylib")
     }
 
     enterprise_cert_dict = {
-        "cert_info": cert_info,
+        "cert_configs": {"macos_keychain": {"issuer": issuer}},
         "libs": libs,
         "version": "1"
     }
@@ -39,16 +37,14 @@ def _generate_linux_enterprise_cert_json(issuer):
     if issuer is None:
         issuer = "Google Endpoint Verification"
 
-    cert_info = { "issuer" : issuer }
-
     libs = {
-        "signer_binary": os.path.join(signer_binaries_folder, "linux64", "signer"),
-        "signer_library": os.path.join(signer_binaries_folder, "linux64", "signer.so"),
-        "offload_library": os.path.join(build_folder, "libcertificate_offload.so")
+        "signer_binary": os.path.join(signer_binaries_folder, "linux64", "ecp"),
+        "signer_library": os.path.join(signer_binaries_folder, "linux64", "libecp.so"),
+        "offload_library": os.path.join(build_folder, "libtls_offload.so")
     }
 
     enterprise_cert_dict = {
-        "cert_info": cert_info,
+        "cert_configs": {"pkcs11": {"issuer": issuer}},
         "libs": libs,
         "version": "1"
     }
@@ -70,4 +66,4 @@ def generate_enterprise_cert_file(issuer = None):
     else:
         enterprise_cert_json = _generate_linux_enterprise_cert_json(issuer)
     return _write_enterprise_cert_json(enterprise_cert_json)
-    
+

@@ -23,36 +23,36 @@ function set_up_env() {
 
   if [[ "$(uname)" == 'Linux' ]]; then
      BUILD_SCRIPT="build/scripts/linux_amd64.sh"
-     SIGNER_BINARY="build/bin/linux_amd64/signer"
-     SIGNER_SHARED_LIB="build/bin/linux_amd64/signer.so"
+     SIGNER_BINARY="build/bin/linux_amd64/ecp"
+     SIGNER_SHARED_LIB="build/bin/linux_amd64/libecp.so"
      TEST_BINARY_FOLDER="$PWD/tests/testing_utils/signer_binaries/linux64"
   elif [[ "$(uname)" == 'Darwin' ]]; then
      BUILD_SCRIPT="build/scripts/darwin_amd64.sh"
-     SIGNER_BINARY="build/bin/darwin_amd64/signer"
-     SIGNER_SHARED_LIB="build/bin/darwin_amd64/signer.dylib"
+     SIGNER_BINARY="build/bin/darwin_amd64/ecp"
+     SIGNER_SHARED_LIB="build/bin/darwin_amd64/libecp.dylib"
      TEST_BINARY_FOLDER="$PWD/tests/testing_utils/signer_binaries/mac64"
   else
     echo "This script only supports Linux and MacOS."
-    exit 1 
+    exit 1
   fi
 }
 
 function install_proxy_binaries() {
   BUILD_DIR=$(mktemp -d proxy_signer_buildXXX)
-  pushd $BUILD_DIR
+  pushd "$BUILD_DIR"
   git clone $ENTERPRISE_CERTIFICATE_PROXY_REPO --depth 1
   pushd enterprise-certificate-proxy
 
-  sh $BUILD_SCRIPT
+  sh "$BUILD_SCRIPT"
 
-  mkdir -p $TEST_BINARY_FOLDER
+  mkdir -p "$TEST_BINARY_FOLDER"
 
-  mv $SIGNER_BINARY $TEST_BINARY_FOLDER
-  mv $SIGNER_SHARED_LIB $TEST_BINARY_FOLDER
+  mv "$SIGNER_BINARY" "$TEST_BINARY_FOLDER"
+  mv "$SIGNER_SHARED_LIB" "$TEST_BINARY_FOLDER"
 
   popd
   popd
-  rm -rf $BUILD_DIR
+  rm -rf "$BUILD_DIR"
 }
 
 check_dependencies
