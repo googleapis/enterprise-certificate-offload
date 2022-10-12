@@ -2,6 +2,7 @@
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
+// Test server
 package main
 
 import (
@@ -14,12 +15,12 @@ import (
 )
 
 func printMessage(w http.ResponseWriter, r *http.Request) {
-	log.Println(("Called /foo\n"))
+	log.Println(("Called /foo"))
 	io.WriteString(w, "Call succeeded!\n")
 }
 
 func main() {
-	log.Println(("starting the mTLS server\n"))
+	log.Println(("starting the mTLS server"))
 
 	http.HandleFunc("/foo", printMessage)
 
