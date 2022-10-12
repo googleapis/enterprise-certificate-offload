@@ -16,7 +16,7 @@ jobs:
         with:
           go-version: 1.18
       - name: Checkout
-        uses: actions/checkout@v1
+        uses: actions/checkout@v3
       - name: Install Dependencies
         run: brew update && brew install cmake openssl@1.1
       - name: Build Library
