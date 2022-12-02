@@ -369,7 +369,7 @@ bool AttachKeyCertToSslContext(CustomKey *custom_key, const char *cert,
 
 ENGINE *CreateEngineHelper() {
   g_enable_logging =
-      static_cast<bool>(getenv("GOOGLE_AUTH_TLS_OFFLOAD_LOGGING"));
+      static_cast<bool>(getenv("ENABLE_ENTERPRISE_CERTIFICATE_LOGS"));
   LogInfo("Creating engine...");
 
   // Allocate "ex data". We need a way to attach `CustomKey` to `EVP_PKEY`s that
