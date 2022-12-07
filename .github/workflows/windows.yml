@@ -19,3 +19,7 @@ jobs:
           args: install openssl cmake
       - name: Build Library
         run: cmake -S . -B build && cmake --build build
+      - uses: actions/upload-artifact@v3
+        with:
+          name: Windows Artifacts
+          path: .\build\Debug\tls_offload.dll
