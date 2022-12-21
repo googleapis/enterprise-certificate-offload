@@ -21,41 +21,10 @@ project(GoogleEnterpriseCertificateOffload VERSION 0.1)
 set(CMAKE_CXX_STANDARD 11)
 set(CMAKE_CXX_STANDARD_REQUIRED True)
 
-if (WIN32)
-set(CMAKE_CXX_STANDARD_LIBRARIES "-static-libgcc -static-libstdc++ -lwsock32 -lws2_32 ${CMAKE_CXX_STANDARD_LIBRARIES}")
-set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -Wl,-Bstatic,--whole-archive -lwinpthread -Wl,--no-whole-archive")
-endif()
-
-find_package(OpenSSL 1.1.1 EXACT REQUIRED)
+find_package(OpenSSL 3.0...<3.2 REQUIRED)
 
 add_library(tls_offload SHARED
   src/offload.cpp
 )
 
 target_link_libraries(tls_offload OpenSSL::Crypto OpenSSL::SSL)
-
-if (ENABLE_UNIT_TESTS)
-  include(FetchContent)
-  FetchContent_Declare(
-    googletest
-    GIT_REPOSITORY https://github.com/google/googletest.git
-    GIT_TAG release-1.12.1
-  )
-  FetchContent_MakeAvailable(googletest)
-
-  enable_testing()
-
-  add_executable(
-    offload_unit_test
-    tests/unit/offload_test.cpp
-  )
-
-  target_link_libraries(
-    offload_unit_test
-    GTest::gtest_main
-    tls_offload
-  )
-
-  include(GoogleTest)
-  gtest_discover_tests(offload_unit_test)
-endif()
