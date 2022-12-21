@@ -22,4 +22,8 @@ jobs:
       run: ./scripts/setup_signer_proxy.sh
     - name: Integration Test
       run: ./scripts/integration_test.sh
+    - uses: actions/upload-artifact@v3
+      with:
+        name: Linux Artifacts
+        path: ./build/*.so
 
