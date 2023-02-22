@@ -82,7 +82,7 @@ void FreeExData(void *parent, void *ptr, CRYPTO_EX_DATA *ad, int idx, long argl,
                 void *argp) {
   // CustomKey is created by ConfigureSslContext, so we need to delete the
   // CustomKey stored in ex_data.
-  if (g_enable_logging) {
+  if (g_enable_logging && ptr) {
     std::cout << "deleting custom_key at: " << ptr << std::endl;
   }
   delete static_cast<CustomKey *>(ptr);
