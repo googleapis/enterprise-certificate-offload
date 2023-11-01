@@ -1,5 +1,6 @@
-cryptography==36.0.2
+cryptography
 requests
 pyopenssl
 pytest
 google-auth
+cffi

@@ -9,7 +9,6 @@
 #include <openssl/err.h>
 #include <openssl/evp.h>
 #include <openssl/pem.h>
-#include <openssl/rsa.h>
 #include <openssl/ssl.h>
 #include <openssl/x509.h>
 #include <stdio.h>
@@ -76,7 +75,7 @@ void LogInfo(const std::string &message) {
 
 // "ex data" will be allocated once globally by `CreateEngineOnceGlobally`
 // method.
-int g_rsa_ex_index = -1, g_ec_ex_index = -1;
+int g_key_index = -1;
 
 void FreeExData(void *parent, void *ptr, CRYPTO_EX_DATA *ad, int idx, long argl,
                 void *argp) {
@@ -89,32 +88,11 @@ void FreeExData(void *parent, void *ptr, CRYPTO_EX_DATA *ad, int idx, long argl,
 }
 
 bool SetCustomKey(EVP_PKEY *pkey, CustomKey *key) {
-  if (EVP_PKEY_id(pkey) == EVP_PKEY_RSA) {
-    LogInfo("setting RSA custom key");
-    RSA *rsa = EVP_PKEY_get0_RSA(pkey);
-    return rsa && RSA_set_ex_data(rsa, g_rsa_ex_index, key);
-  }
-  if (EVP_PKEY_id(pkey) == EVP_PKEY_EC) {
-    LogInfo("setting EC custom key");
-    EC_KEY *ec_key = EVP_PKEY_get0_EC_KEY(pkey);
-    return ec_key && EC_KEY_set_ex_data(ec_key, g_ec_ex_index, key);
-  }
-  return false;
+    return EVP_PKEY_set_ex_data(pkey, g_key_index, key);
 }
 
 CustomKey *GetCustomKey(EVP_PKEY *pkey) {
-  if (EVP_PKEY_id(pkey) == EVP_PKEY_RSA) {
-    const RSA *rsa = EVP_PKEY_get0_RSA(pkey);
-    return rsa ? static_cast<CustomKey *>(RSA_get_ex_data(rsa, g_rsa_ex_index))
-               : nullptr;
-  }
-  if (EVP_PKEY_id(pkey) == EVP_PKEY_EC) {
-    const EC_KEY *ec_key = EVP_PKEY_get0_EC_KEY(pkey);
-    return ec_key ? static_cast<CustomKey *>(
-                        EC_KEY_get_ex_data(ec_key, g_ec_ex_index))
-                  : nullptr;
-  }
-  return nullptr;
+  return static_cast<CustomKey *>(EVP_PKEY_get_ex_data(pkey, g_key_index));
 }
 
 // Part 2. Next we make an `EVP_PKEY_METHOD` that can call `CustomKey::Sign`.
@@ -374,11 +352,9 @@ ENGINE *CreateEngineHelper() {
 
   // Allocate "ex data". We need a way to attach `CustomKey` to `EVP_PKEY`s that
   // we will hand to OpenSSL. OpenSSL does this with "ex data"
-  g_rsa_ex_index =
-      RSA_get_ex_new_index(0, nullptr, nullptr, nullptr, FreeExData);
-  g_ec_ex_index =
-      EC_KEY_get_ex_new_index(0, nullptr, nullptr, nullptr, FreeExData);
-  if (g_rsa_ex_index < 0 || g_ec_ex_index < 0) {
+  g_key_index =
+      EVP_PKEY_get_ex_new_index(0, nullptr, nullptr, nullptr, FreeExData);
+  if (g_key_index < 0) {
     LogInfo("Error allocating ex data");
     return nullptr;
   }

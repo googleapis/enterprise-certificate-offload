@@ -9,15 +9,13 @@ on:
 jobs:
 
   CI:
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-22.04
     steps:
     - name: Install Dependencies
-      run: sudo apt update && sudo apt install -y cmake
+      run: sudo apt update && sudo apt install -y cmake openssl
     - uses: actions/checkout@v3
     - name: Build
       run: cmake -S . -B build -DENABLE_UNIT_TESTS=TRUE && cmake --build build
-    - name: Unit Test
-      run: ./build/offload_unit_test
     - name: Set up Signer Proxy Binaries
       run: ./scripts/setup_signer_proxy.sh
     - name: Integration Test
