@@ -18,7 +18,7 @@ jobs:
         with:
           args: install openssl cmake
       - name: Build Library
-        run: cmake -S . -B build && cmake --build build
+        run: cmake -S . -B build && cmake --build build && openssl version
       - uses: actions/upload-artifact@v3
         with:
           name: Windows Artifacts
