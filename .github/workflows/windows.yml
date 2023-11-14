@@ -19,7 +19,7 @@ env:
   PROVIDER_PATH: "${{ github.workspace }}/bin/libecp_provider.dll"
 
 jobs:
-  test:
+  CI:
     runs-on: windows-latest
     steps:
       -
