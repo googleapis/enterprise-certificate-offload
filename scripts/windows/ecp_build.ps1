@@ -20,7 +20,7 @@ New-Item -ItemType Directory -Path $env:ECP_BIN_DIR
 git clone https://github.com/googleapis/enterprise-certificate-proxy.git --depth=1
 Push-Location enterprise-certificate-proxy
 
-.\build\scripts\windows\windows_amd64.ps1
+.\build\scripts\windows_amd64.ps1
 Copy-Item .\build\bin\windows_amd64\* $env:ECP_BIN_DIR
 
 Pop-Location
