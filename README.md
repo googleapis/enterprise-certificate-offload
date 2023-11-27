@@ -49,5 +49,9 @@ $ sudo docker run -t ecp-build -it /bin/zsh
 Tests are stored in the `tests` directory. Only integration tests exist. They
 test that the Provider works in the following scenarios:
 
-1. OpenSSL to OpenSSL mTLS.
-1. Python to OpenSSL mTLS.
+1. OpenSSL to OpenSSL mTLS. An OpenSSL server will be spun up that requires
+   client verification. The OpenSSL client will be used to connect to the
+   server, using ECP backed credentials.
+1. Python to OpenSSL mTLS. An OpenSSL server will be spun up that requires
+   client verification. The Python `request` library will be used to connect to the
+   server, using ECP backed credentials, and submit a HTTPS request.

@@ -1,6 +1,26 @@
 // Copyright 2023 Google LLC this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
+/*
+This provider implements ECP (Enterprise Certificate Provider) for OpenSSL. It
+provides functions for signing and verifying digital signatures using EC
+(Elliptic Curve) and RSA keys. It also provides functions for managing EC and
+RSA keys.
+
+Key Features:
+
+* Supports signing and verifying digital signatures using EC and RSA keys
+* Provides functions for managing EC and RSA keys
+* Supports loading certificates and private keys from ECP storage
+
+To use the ECP provider, you first need to initialize it by calling the
+OSSL_provider_init() function. This function will create a provider context that
+you can then use to perform signature operations and key management tasks.
+
+ECP_attach_to_ctx can be used to attach the ECP provider to an existing OpenSSL
+SSL_CTX object.
+ */
+
 #include <openssl/core.h>
 #include <openssl/core_dispatch.h>
 #include <openssl/core_names.h>

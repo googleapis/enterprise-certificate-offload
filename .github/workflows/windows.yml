@@ -31,14 +31,14 @@ jobs:
         with:
           args: install openssl cmake curl
       - name: Install ECP
-        run: .\scripts\ecp_build.ps1
+        run: .\scripts\windows\ecp_build.ps1
       - name: Build Library
         run: cmake -S ecp-provider -B build -G "MinGW Makefiles" -DDEBUG_LOGS=TRUE && cmake --build build && Copy-Item build\libecp_provider.dll $env:PROVIDER_PATH
       - name: Set up credentials
         run: |
-          .\scripts\create_client_creds.ps1
-          .\scripts\create_server_creds.ps1
-          .\scripts\windows_setup.ps1
+          .\scripts\windows\create_client_creds.ps1
+          .\scripts\windows\create_server_creds.ps1
+          .\scripts\windows\windows_setup.ps1
           # Tests are currently not passing on the windows CI.
           #       - name: Test mTLS Python
           #         run: |
