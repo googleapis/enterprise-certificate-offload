@@ -190,6 +190,10 @@ int CustomDigestSign(EVP_MD_CTX *ctx, unsigned char *sig, size_t *sig_len,
       LogInfo("Unsupported ECDSA hash");
       return 0;
     }
+    if (sig == NULL) {
+      *sig_len = 72;
+      return 1;
+    }
   } else if (EVP_PKEY_id(pkey) == EVP_PKEY_RSA) {
     const EVP_MD *md;
     if (EVP_PKEY_CTX_get_signature_md(pctx, &md) != 1 ||
@@ -213,6 +217,10 @@ int CustomDigestSign(EVP_MD_CTX *ctx, unsigned char *sig, size_t *sig_len,
         (val != EVP_MD_size(md) && val != -1)) {
       LogInfo("Unsupported RSA-PSS salt length");
       return 0;
+    }
+    if (sig == NULL) {
+      *sig_len = 256;
+      return 1;
     }
   } else {
     LogInfo("Unsupported key");
