@@ -2,7 +2,7 @@
 // license that can be found in the LICENSE file.
 
 /*
-This provider implements ECP (Enterprise Certificate Provider) for OpenSSL. It
+This provider implements a bridge from OpenSSL to ECP (Enterprise Certificate Provider). It
 provides functions for signing and verifying digital signatures using EC
 (Elliptic Curve) and RSA keys. It also provides functions for managing EC and
 RSA keys.
@@ -81,13 +81,13 @@ typedef struct ecp_context {
 } ecp_context_t;
 
 static int config_helper(ecp_context_t *ctx, char **ret_config) {
-  char *config = getenv("GOOGLE_API_CERTIFICATE_CONFIG");
+  char *config = ctx->ecp_config_path;
   if (config == NULL) {
-    if (ctx->ecp_config_path == NULL) {
+    char *config = getenv("GOOGLE_API_CERTIFICATE_CONFIG");
+    if (config == NULL) {
       debug_printf("Unable to determine ECP config path.\n");
       return 0;
     }
-    config = ctx->ecp_config_path;
   }
   *ret_config = config;
   return 1;
@@ -622,9 +622,13 @@ ECP_API const char *ECP_version() { return provider_version; }
 ECP_API int ECP_attach_to_ctx(SSL_CTX *ctx, char *ecp_config_path) {
   debug_printf("Called ECP_attach_to_ctx\n");
 
-  char *config = getenv("GOOGLE_API_CERTIFICATE_CONFIG");
+  char *config = ecp_config_path;
   if (config == NULL) {
-    config = ecp_config_path;
+    config = getenv("GOOGLE_API_CERTIFICATE_CONFIG");
+    if (config == NULL) {
+      debug_printf("Unable to determine ECP config.\n");
+      return 0;
+    }
   }
 
   X509 *cert = X509_new();
