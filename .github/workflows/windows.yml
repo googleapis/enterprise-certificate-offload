@@ -1,12 +1,25 @@
 name: Windows CI
 on:
   push:
-    branches: [ main ]
+    branches: [ main, provider ]
   pull_request:
     branches: [ main ]
+env:
+  ECP_BIN_DIR: "${{ github.workspace }}/bin"
+  EC_SERVER_KEY: "${{ github.workspace }}/ec_prime256v1_serverkey.pem"
+  EC_SERVER_CERT: "${{ github.workspace }}/ec_prime256v1_servercert.pem"
+  EC_CLIENT_KEY: "${{ github.workspace }}/ec_prime256v1_clientkey.pem"
+  EC_CLIENT_CERT: "${{ github.workspace }}/ec_prime256v1_clientcert.pem"
+  RSA_SERVER_KEY: "${{ github.workspace }}/rsa_2048_serverkey.pem"
+  RSA_SERVER_CERT: "${{ github.workspace }}/rsa_2048_servercert.pem"
+  RSA_CLIENT_KEY: "${{ github.workspace }}/rsa_2048_clientkey.pem"
+  RSA_CLIENT_CERT: "${{ github.workspace }}/rsa_2048_clientcert.pem"
+  EC_ISSUER: "EC Test Object"
+  RSA_ISSUER: "RSA Test Object"
+  PROVIDER_PATH: "${{ github.workspace }}/bin/libecp_provider.dll"
 
 jobs:
-  test:
+  CI:
     runs-on: windows-latest
     steps:
       -
@@ -16,10 +29,18 @@ jobs:
         name: Choco install dependencies
         uses: crazy-max/ghaction-chocolatey@v2
         with:
-          args: install openssl cmake
+          args: install openssl cmake curl
+      - name: Install ECP
+        run: .\scripts\windows\ecp_build.ps1
       - name: Build Library
-        run: cmake -S . -B build && cmake --build build
-      - uses: actions/upload-artifact@v3
-        with:
-          name: Windows Artifacts
-          path: .\build\Debug\tls_offload.dll
+        run: cmake -S ecp-provider -B build -G "MinGW Makefiles" -DDEBUG_LOGS=TRUE && cmake --build build && Copy-Item build\libecp_provider.dll $env:PROVIDER_PATH
+      - name: Set up credentials
+        run: |
+          .\scripts\windows\create_client_creds.ps1
+          .\scripts\windows\create_server_creds.ps1
+          .\scripts\windows\windows_setup.ps1
+          # Tests are currently not passing on the windows CI.
+          #       - name: Test mTLS Python
+          #         run: |
+          #           Start-Process -FilePath .\scripts\start_mtls_https_server.ps1
+          #           .\tests\test_mtls_py.ps1

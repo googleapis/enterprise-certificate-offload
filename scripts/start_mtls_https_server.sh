@@ -1,6 +1,6 @@
-# ~~~
-# Copyright 2022 Google Inc.
-#
+#!/bin/zsh
+
+# Copyright 2023 Google LLC.
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
@@ -12,19 +12,14 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-# ~~~
 
-cmake_minimum_required(VERSION 3.10)
+set -eux
 
-project(GoogleEnterpriseCertificateOffload VERSION 0.1)
+source scripts/credential_names.sh
 
-set(CMAKE_CXX_STANDARD 11)
-set(CMAKE_CXX_STANDARD_REQUIRED True)
+echo "hello world" > input.txt
+echo "OK" > response.txt
 
-find_package(OpenSSL 3.0...<3.2 REQUIRED)
+$OPENSSL_CLI s_server -accept 8888 -Verify 1 -cert "$EC_SERVER_CERT" -key "$EC_SERVER_KEY" -CAfile "$EC_CLIENT_CERT" &>/tmp/mtls_server_logs.txt < response.txt -debug -state -WWW&
 
-add_library(tls_offload SHARED
-  src/offload.cpp
-)
-
-target_link_libraries(tls_offload OpenSSL::Crypto OpenSSL::SSL)
+$OPENSSL_CLI s_server -accept 8889 -Verify 1 -cert "$RSA_SERVER_CERT" -key "$RSA_SERVER_KEY" -CAfile "$RSA_CLIENT_CERT" &>/tmp/mtls_server_logs.txt < response.txt -debug -state -WWW&

@@ -1,90 +1,57 @@
-# enterprise-certificate-offload
+# Introduction
 
-Repository for the Enterprise Certificate project. This will host C++ source code to offload the TLS signing operation to a signing interface via OpenSSL engine API. The signing interface implementation will be provided by the users. The library will be used by google-auth-library-python library, and distributed as binaries via gCloud SDK.
+This repo contains an implementation of an OpenSSL provider. This provider only
+supports signature operations using [ECP](https://github.com/googleapis/enterprise-certificate-proxy).
 
+The provider is coded to tightly integrate with ECP and generally various
+algorithms will be hard coded.
 
-### Building
+The primary use of this library is by the google-auth-library-python library.
 
-This library is build with CMake. In order to compile the code successfully
-please install the following dependencies:
+# Getting Started
 
-1. CMake
-1. OpenSSL 1.1.1
+## Starting point
 
-Once the dependencies are installed the library can be built with the following
-commands.
+The GitHub actions document how to build, test, and run this provider. The
+simplest to start from is the Linux CI, as all the complexity is in Docker.
 
-#### Linux
+## Required Dependencies
 
-```sh
-$ cmake -S . -B build # generates build files
-$ cmake --build build # compiles the library
-```
-The binary can now be found at `build/libcertificate_offload.so`.
+The scripts in this repo require `zsh`.
 
-#### MacOS
+## Linux
 
-```
-$ OPENSSL_ROOT_DIR="$(brew --prefix openssl@1.1)" cmake -S . -B build # If OpenSSL is installed via home brew (recommended), specify the OpenSSL root directory with the following command.
-$ cmake --build build # compiles the library
-```
+### **Recommended** Setup (Docker)
 
-The binary can now be found at `build/libcertificate_offload.dylib`.
+A development environment can be bootstrapped using docker.
 
-
-### Testing
-
-#### Test Dependencies
-
-The [Enterprise Certificate Proxy](https://github.com/googleapis/enterprise-certificate-proxy)
-is an integration test dependency for this library.
-
-In order for the integration tests to pass the binaries from enterprise-certificate-proxy must first be compiled.
-To do this run `$ ./scripts/setup_signer_proxy.sh`. This will fetch the current tip of the
-enterprise-certificate-proxy repo, compile it, and move the binaries to where
-the tests are expecting them.
-
-#### Integration Tests
-
-The integration tests for the `enterprise-certificate-offload` are in the
-`tests/integration_test.py` file.
-
-To run the integration tests, run `$ ./scripts/integration_test.sh`.
-
-Alternatively, the integration tests can manually be run by following these
-steps:
-
-#### Install Python dependencies.
-
-First (optionally) create a virtual environment.
+#### Build a docker image
 
 ```
-pyenv virtualenv myenv
-pyenv local myenv
+$ sudo docker build -t ecp-build -f utils/linux/Dockerfile .
 ```
 
-Then install the dependencies
-```
-python -m pip install -r requirements.txt
-```
+#### Run test suites in docker image
 
-To debug the offload library, set `GOOGLE_AUTH_TLS_OFFLOAD_LOGGING=1`.
-
-#### Run a local mTLS server
-
-There are 2 methods to start a local mTLS server using the testing certs:
-
-Method 1: In the root folder of this repo run the golang server
 ```
-go run -v ./tests/testing_utils/server/server.go
-```
-It listens to `https://localhost:3000/foo`.
-
-Method 2: Navigate to `./testing/cert` folder, and start an OpenSSL s_server
-```
-openssl s_server -cert rsa_cert.pem -key rsa_key.pem -CAfile ca_cert.pem -WWW -port 3000 -verify_return_error -Verify 1
+$ sudo docker run ecp-build zsh -c '/work-dir/scripts/start_mtls_server.sh && for test in /work-dir/tests/*; do zsh $test; done'
 ```
 
-#### Run the integration test
+#### Work in docker image
 
-After completing the previous two steps, run `$ python -m pytest tests/test.py`.
+```
+$ sudo docker run -t ecp-build -it /bin/zsh
+```
+
+
+# Testing
+
+Tests are stored in the `tests` directory. Only integration tests exist. They
+test that the Provider works in the following scenarios:
+
+1. OpenSSL to OpenSSL mTLS. An OpenSSL server will be spun up that requires
+   client verification. The OpenSSL client will be used to connect to the
+   server, using ECP backed credentials.
+1. Python to OpenSSL mTLS. An OpenSSL server will be spun up that requires
+   client verification. The Python `request` library will be used to connect to the
+   server, using ECP backed credentials, and submit a HTTPS request.

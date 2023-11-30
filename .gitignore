@@ -1,58 +1,18 @@
-# Prerequisites
-*.d
-
-# Compiled Object files
-*.slo
-*.lo
-*.o
-*.obj
-
-# Precompiled Headers
-*.gch
-*.pch
-
-# Fortran module files
-*.mod
-*.smod
-
-# Compiled Static libraries
-*.lai
-*.la
-*.a
-*.lib
-
-# Executables
-*.out
-*.app
-*.exe
-
-# Python
-.python-version
-**/__pycache__/*
-test/integration/*sponge_log.xml
-test/integration/*.pyc
-env/
-
-# Build folder
-build
-
-# Test Binaries folder
-tests/testing_utils/signer_binaries
-
-# CMake
-
-CMakeLists.txt.user
-CMakeCache.txt
-CMakeFiles
-CMakeScripts
-Testing
-Makefile
-cmake_install.cmake
-install_manifest.txt
+.ccls-cache
+openssl
+ecp-provider/build
+*.so
+**/*.so
+env
+input.txt
 compile_commands.json
-CTestTestfile.cmake
-_deps
-Footer
-
-# Misc
-local_mtls_server_logs.txt
+ecp-provider/compile_commands.json
+*.der
+*.pem
+certificate_config.json
+*.bin
+bin
+build
+response.txt
+ecp_openssl.conf
+google-auth-library-python/
