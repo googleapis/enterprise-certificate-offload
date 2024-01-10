@@ -724,6 +724,7 @@ ECP_API int OSSL_provider_init(const OSSL_CORE_HANDLE *core,
     ctx->ecp_config_path =
         (char *)malloc(sizeof(char) * ctx->ecp_config_path_len);
     strncpy(ctx->ecp_config_path, config_path, ctx->ecp_config_path_len);
+    ctx->ecp_config_path[ctx->ecp_config_path_len] = '\0';
   }
 
   *out = ecp_prov_functions;
