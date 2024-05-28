@@ -1,0 +1,6 @@
+cryptography
+requests
+pyopenssl
+pytest
+google-auth
+cffi

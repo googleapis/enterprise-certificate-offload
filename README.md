@@ -1,57 +1,90 @@
-# Introduction
+# enterprise-certificate-offload
 
-This repo contains an implementation of an OpenSSL provider. This provider only
-supports signature operations using [ECP](https://github.com/googleapis/enterprise-certificate-proxy).
+Repository for the Enterprise Certificate project. This will host C++ source code to offload the TLS signing operation to a signing interface via OpenSSL engine API. The signing interface implementation will be provided by the users. The library will be used by google-auth-library-python library, and distributed as binaries via gCloud SDK.
 
-The provider is coded to tightly integrate with ECP and generally various
-algorithms will be hard coded.
 
-The primary use of this library is by the google-auth-library-python library.
+### Building
 
-# Getting Started
+This library is build with CMake. In order to compile the code successfully
+please install the following dependencies:
 
-## Starting point
+1. CMake
+1. OpenSSL 1.1.1
 
-The GitHub actions document how to build, test, and run this provider. The
-simplest to start from is the Linux CI, as all the complexity is in Docker.
+Once the dependencies are installed the library can be built with the following
+commands.
 
-## Required Dependencies
+#### Linux
 
-The scripts in this repo require `zsh`.
+```sh
+$ cmake -S . -B build # generates build files
+$ cmake --build build # compiles the library
+```
+The binary can now be found at `build/libcertificate_offload.so`.
 
-## Linux
-
-### **Recommended** Setup (Docker)
-
-A development environment can be bootstrapped using docker.
-
-#### Build a docker image
+#### MacOS
 
 ```
-$ sudo docker build -t ecp-build -f utils/linux/Dockerfile .
+$ OPENSSL_ROOT_DIR="$(brew --prefix openssl@1.1)" cmake -S . -B build # If OpenSSL is installed via home brew (recommended), specify the OpenSSL root directory with the following command.
+$ cmake --build build # compiles the library
 ```
 
-#### Run test suites in docker image
+The binary can now be found at `build/libcertificate_offload.dylib`.
+
+
+### Testing
+
+#### Test Dependencies
+
+The [Enterprise Certificate Proxy](https://github.com/googleapis/enterprise-certificate-proxy)
+is an integration test dependency for this library.
+
+In order for the integration tests to pass the binaries from enterprise-certificate-proxy must first be compiled.
+To do this run `$ ./scripts/setup_signer_proxy.sh`. This will fetch the current tip of the
+enterprise-certificate-proxy repo, compile it, and move the binaries to where
+the tests are expecting them.
+
+#### Integration Tests
+
+The integration tests for the `enterprise-certificate-offload` are in the
+`tests/integration_test.py` file.
+
+To run the integration tests, run `$ ./scripts/integration_test.sh`.
+
+Alternatively, the integration tests can manually be run by following these
+steps:
+
+#### Install Python dependencies.
+
+First (optionally) create a virtual environment.
 
 ```
-$ sudo docker run ecp-build zsh -c '/work-dir/scripts/start_mtls_server.sh && for test in /work-dir/tests/*; do zsh $test; done'
+pyenv virtualenv myenv
+pyenv local myenv
 ```
 
-#### Work in docker image
-
+Then install the dependencies
 ```
-$ sudo docker run -t ecp-build -it /bin/zsh
+python -m pip install -r requirements.txt
 ```
 
+To debug the offload library, set `GOOGLE_AUTH_TLS_OFFLOAD_LOGGING=1`.
 
-# Testing
+#### Run a local mTLS server
 
-Tests are stored in the `tests` directory. Only integration tests exist. They
-test that the Provider works in the following scenarios:
+There are 2 methods to start a local mTLS server using the testing certs:
 
-1. OpenSSL to OpenSSL mTLS. An OpenSSL server will be spun up that requires
-   client verification. The OpenSSL client will be used to connect to the
-   server, using ECP backed credentials.
-1. Python to OpenSSL mTLS. An OpenSSL server will be spun up that requires
-   client verification. The Python `request` library will be used to connect to the
-   server, using ECP backed credentials, and submit a HTTPS request.
+Method 1: In the root folder of this repo run the golang server
+```
+go run -v ./tests/testing_utils/server/server.go
+```
+It listens to `https://localhost:3000/foo`.
+
+Method 2: Navigate to `./testing/cert` folder, and start an OpenSSL s_server
+```
+openssl s_server -cert rsa_cert.pem -key rsa_key.pem -CAfile ca_cert.pem -WWW -port 3000 -verify_return_error -Verify 1
+```
+
+#### Run the integration test
+
+After completing the previous two steps, run `$ python -m pytest tests/test.py`.
