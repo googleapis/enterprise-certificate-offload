@@ -17,6 +17,7 @@ env:
   EC_ISSUER: "EC Test Object"
   RSA_ISSUER: "RSA Test Object"
   PROVIDER_PATH: "${{ github.workspace }}/bin/libecp_provider.dll"
+  OPENSSL_ROOT_DIR: "C:\\Program Files\\OpenSSL\\"
 
 jobs:
   CI:
@@ -25,6 +26,11 @@ jobs:
       -
         name: Checkout
         uses: actions/checkout@v3
+      -
+        name: Choco install dependencies - OpenSSL
+        uses: crazy-max/ghaction-chocolatey@v2
+        with:
+          args: install openssl --version 3.1.1
       -
         name: Choco install dependencies
         uses: crazy-max/ghaction-chocolatey@v2

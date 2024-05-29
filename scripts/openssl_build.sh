@@ -25,8 +25,8 @@ git clone https://github.com/openssl/openssl.git --depth=1
 
 pushd openssl
 git fetch --tags
-git checkout openssl-3.0.11
+git checkout openssl-$OPENSSL_VERSION
 
-./config -d
+./config -d no-shared
 make -j$(nproc)
 popd

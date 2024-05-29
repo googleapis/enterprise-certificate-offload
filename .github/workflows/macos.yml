@@ -7,6 +7,7 @@ on:
     branches: [ main ]
 env:
   ECP_BIN_DIR: "${{ github.workspace }}/bin"
+  DYLD_LIBRARY_PATH: "${{ github.workspace }}/bin"
 
 jobs:
   CI:
@@ -17,7 +18,7 @@ jobs:
           python-version: '3.11'
       - uses: actions/setup-go@v3
         with:
-          go-version: 1.18
+          go-version: 1.21
       - name: Checkout
         uses: actions/checkout@v3
       - name: Install Dependencies
@@ -27,7 +28,6 @@ jobs:
       - name: Build Provider
         run: |
           # Hack for now until we have a better way to link ECP.
-          scp $ECP_BIN_DIR/libecp.dylib ecp-provider/libecp.dylib
           OPENSSL_ROOT_DIR="$(brew --prefix openssl@3.0)" cmake -S ecp-provider -B build && cmake --build build && scp build/libecp_provider.dylib $ECP_BIN_DIR
       - name: Set up credentials
         run: |
