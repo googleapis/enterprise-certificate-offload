@@ -77,7 +77,6 @@ typedef struct ecp_context {
   size_t digest_name_len;
   key_types_t key_type;
   int initialized;
-  OSSL_LIB_CTX *libctx;
 } ecp_context_t;
 
 static int config_helper(ecp_context_t *ctx, char **ret_config) {
@@ -147,7 +146,7 @@ static int ecp_dig_sign_init(void *provctx, const char *mdname, void *provkey,
   for (long unsigned int i = 0; i < sizeof(supported_mds) / sizeof(char *);
        i++) {
     if (strncmp(mdname, supported_mds[i], strlen(supported_mds[i])) == 0) {
-      EVP_MD *md = EVP_MD_fetch(ctx->libctx, mdname, NULL);
+      EVP_MD *md = EVP_MD_fetch(NULL, mdname, NULL);
       if (md == NULL) {
         return 0;
       }
@@ -169,7 +168,6 @@ static int ecp_dig_sign(void *provctx, unsigned char *sigret, size_t *siglen,
   debug_printf("Called ecp_dig_sign\n");
   ecp_context_t *ctx = (ecp_context_t *)provctx;
   size_t sig_size_bytes = MAX_SIGNATURE_BUFFER_LEN;
-  OSSL_LIB_CTX *libctx = ctx->libctx;
 
   if (sigret == NULL) {
     *siglen = sig_size_bytes;
@@ -177,7 +175,7 @@ static int ecp_dig_sign(void *provctx, unsigned char *sigret, size_t *siglen,
     return 1;
   }
 
-  EVP_MD *md = EVP_MD_fetch(libctx, ctx->digest_name, NULL);
+  EVP_MD *md = EVP_MD_fetch(NULL, ctx->digest_name, NULL);
   if (md == NULL) {
     debug_printf("Failed to create md object.\n");
     return 0;
@@ -631,6 +629,11 @@ ECP_API int ECP_attach_to_ctx(SSL_CTX *ctx, char *ecp_config_path) {
     }
   }
 
+  if(OPENSSL_init_crypto(OPENSSL_INIT_LOAD_CONFIG, NULL) != 1) {
+    debug_printf("Failed to init libcrypto.\n");
+    return 0;
+  }
+
   X509 *cert = X509_new();
   if (cert == NULL) {
     debug_printf("Unable to create certificate object.\n");
@@ -706,10 +709,6 @@ ECP_API int OSSL_provider_init(const OSSL_CORE_HANDLE *core,
     return 0;
   }
 
-  OSSL_LIB_CTX *libctx = OSSL_LIB_CTX_new_from_dispatch(core, in);
-  if (libctx == NULL) {
-    return 0;
-  }
 
   ecp_context_t *ctx = malloc(sizeof(ecp_context_t));
   memset(ctx, 0, sizeof(ecp_context_t));
@@ -717,7 +716,6 @@ ECP_API int OSSL_provider_init(const OSSL_CORE_HANDLE *core,
   if (ctx == NULL) {
     return 0;
   }
-  ctx->libctx = libctx;
 
   if (config_path != NULL) {
     ctx->ecp_config_path_len = strlen(config_path);
