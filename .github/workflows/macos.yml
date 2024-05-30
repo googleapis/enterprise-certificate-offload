@@ -1,9 +1,13 @@
 name: MacOS CI
+
 on:
   push:
-    branches: [ main ]
+    branches: [ main, provider ]
   pull_request:
     branches: [ main ]
+env:
+  ECP_BIN_DIR: "${{ github.workspace }}/bin"
+  DYLD_LIBRARY_PATH: "${{ github.workspace }}/bin"
 
 jobs:
   CI:
@@ -11,23 +15,32 @@ jobs:
     steps:
       - uses: actions/setup-python@v4
         with:
-          python-version: '3.8'
+          python-version: '3.11'
       - uses: actions/setup-go@v3
         with:
-          go-version: 1.18
+          go-version: 1.21
       - name: Checkout
         uses: actions/checkout@v3
       - name: Install Dependencies
-        run: brew update && brew install cmake openssl@1.1
-      - name: Build Library
-        run: OPENSSL_ROOT_DIR="$(brew --prefix openssl@1.1)" cmake -S . -B build -DENABLE_UNIT_TESTS=TRUE && cmake --build build
-      - name: Unit Test
-        run: ./build/offload_unit_test
-      - name: Set up Signer Proxy Binaries
-        run: ./scripts/setup_signer_proxy.sh
-      - name: Integration Test
-        run: ./scripts/integration_test.sh
-      - uses: actions/upload-artifact@v3
-        with:
-          name: MacOS Artifacts
-          path: ./build/*.dylib
+        run: brew update && brew install cmake perl make gcc curl openssl@3.0
+      - name: Install ECP
+        run: ./scripts/ecp_build.sh
+      - name: Build Provider
+        run: |
+          OPENSSL_ROOT_DIR="$(brew --prefix openssl@3.0)" cmake -S ecp-provider -B build && cmake --build build && scp build/libecp_provider.dylib $ECP_BIN_DIR
+      - name: Set up credentials
+        run: |
+          export OPENSSL_CLI="$(brew --prefix openssl@3.0)/bin/openssl"
+          zsh ./scripts/create_server_creds.sh
+          zsh ./scripts/create_client_creds.sh
+          zsh ./scripts/macos_setup.sh
+      - name: Test Sign Using Env Variable
+        run: export OPENSSL_CLI="$(brew --prefix openssl@3.0)/bin/openssl"; ./tests/test_sign.sh
+      - name: Test mTLS Using Env Variable
+        run: export OPENSSL_CLI="$(brew --prefix openssl@3.0)/bin/openssl"; ./scripts/start_mtls_https_server.sh && ./tests/test_mtls.sh
+      - name: Test mTLS Using Config
+        run: export OPENSSL_CLI="$(brew --prefix openssl@3.0)/bin/openssl"; ./scripts/start_mtls_https_server.sh && ./tests/test_mtls_with_conf.sh
+      - name: Test mTLS Python Using Env Variable
+        run: export OPENSSL_CLI="$(brew --prefix openssl@3.0)/bin/openssl"; ./scripts/start_mtls_https_server.sh && ./tests/test_mtls_py.sh
+      - name: Test mTLS Python Using Config
+        run: export OPENSSL_CLI="$(brew --prefix openssl@3.0)/bin/openssl"; ./scripts/start_mtls_https_server.sh && ./tests/test_mtls_py_with_conf.sh

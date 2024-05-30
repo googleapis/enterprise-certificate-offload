@@ -2,28 +2,24 @@ name: Linux CI
 
 on:
   push:
-    branches: [ main ]
+    branches: [ main, provider ]
   pull_request:
     branches: [ main ]
 
 jobs:
-
   CI:
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-22.04
     steps:
-    - name: Install Dependencies
-      run: sudo apt update && sudo apt install -y cmake
     - uses: actions/checkout@v3
-    - name: Build
-      run: cmake -S . -B build -DENABLE_UNIT_TESTS=TRUE && cmake --build build
-    - name: Unit Test
-      run: ./build/offload_unit_test
-    - name: Set up Signer Proxy Binaries
-      run: ./scripts/setup_signer_proxy.sh
-    - name: Integration Test
-      run: ./scripts/integration_test.sh
-    - uses: actions/upload-artifact@v3
-      with:
-        name: Linux Artifacts
-        path: ./build/*.so
-
+    - name: Build Test Image
+      run: docker build -t ecp-build -f utils/linux/Dockerfile .
+    - name: Test Sign Using Env Variable
+      run: docker run ecp-build zsh -c '/work-dir/tests/test_sign.sh'
+    - name: Test mTLS Using Env Variable
+      run: docker run ecp-build zsh -c '/work-dir/scripts/start_mtls_https_server.sh && /work-dir/tests/test_mtls.sh'
+    - name: Test mTLS Using Config
+      run: docker run ecp-build zsh -c '/work-dir/scripts/start_mtls_https_server.sh && /work-dir/tests/test_mtls_with_conf.sh'
+    - name: Test mTLS Python Using Env Variable
+      run: docker run ecp-build zsh -c '/work-dir/scripts/start_mtls_https_server.sh && /work-dir/tests/test_mtls_py.sh'
+    - name: Test mTLS Python Using Config
+      run: docker run ecp-build zsh -c '/work-dir/scripts/start_mtls_https_server.sh && /work-dir/tests/test_mtls_py_with_conf.sh'
