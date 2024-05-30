@@ -30,7 +30,6 @@ pushd enterprise-certificate-proxy
 if [[ $OSTYPE == darwin* ]]; then
     ./build/scripts/darwin_amd64.sh
     scp ./build/bin/darwin_amd64/* $ECP_BIN_DIR
-    scp ./build/bin/darwin_amd64/* /usr/local/lib/
 else
     ./build/scripts/linux_amd64.sh
     scp ./build/bin/linux_amd64/* $ECP_BIN_DIR
