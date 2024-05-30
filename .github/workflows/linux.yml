@@ -2,12 +2,11 @@ name: Linux CI
 
 on:
   push:
-    branches: [ main ]
+    branches: [ main, provider ]
   pull_request:
     branches: [ main ]
 
 jobs:
-
   CI:
     runs-on: ubuntu-22.04
     steps:
@@ -24,4 +23,16 @@ jobs:
       with:
         name: Linux Artifacts
         path: ./build/*.so
-
+    - uses: actions/checkout@v4
+    - name: Build Test Image
+      run: docker build -t ecp-build -f utils/linux/Dockerfile .
+    - name: Test Sign Using Env Variable
+      run: docker run ecp-build zsh -c '/work-dir/tests/test_sign.sh'
+    - name: Test mTLS Using Env Variable
+      run: docker run ecp-build zsh -c '/work-dir/scripts/start_mtls_https_server.sh && /work-dir/tests/test_mtls.sh'
+    - name: Test mTLS Using Config
+      run: docker run ecp-build zsh -c '/work-dir/scripts/start_mtls_https_server.sh && /work-dir/tests/test_mtls_with_conf.sh'
+    - name: Test mTLS Python Using Env Variable
+      run: docker run ecp-build zsh -c '/work-dir/scripts/start_mtls_https_server.sh && /work-dir/tests/test_mtls_py.sh'
+    - name: Test mTLS Python Using Config
+      run: docker run ecp-build zsh -c '/work-dir/scripts/start_mtls_https_server.sh && /work-dir/tests/test_mtls_py_with_conf.sh'
