@@ -26,8 +26,8 @@ jobs:
         run: ./scripts/ecp_build.sh
       - name: Build Provider
         run: |
-          OPENSSL_ROOT_DIR="$(brew --prefix openssl@3.0)" cmake -S ecp-provider -B build && cmake --build build
-          install_name_tool -change libecp.dylib @loader_path/../bin/libecp.dylib build/libecp_provider.dylib
+          OPENSSL_ROOT_DIR="$(brew --prefix openssl@3.0)" cmake -S ecp-provider -B build && cmake --build build && \
+            install_name_tool -change libecp.dylib @loader_path/../bin/libecp.dylib build/libecp_provider.dylib
       - name: Set up credentials
         run: |
           export OPENSSL_CLI="$(brew --prefix openssl@3.0)/bin/openssl"
