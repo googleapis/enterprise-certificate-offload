@@ -7,7 +7,6 @@ on:
     branches: [ main ]
 env:
   ECP_BIN_DIR: "${{ github.workspace }}/bin"
-  DYLD_LIBRARY_PATH: "${{ github.workspace }}/bin"
 
 jobs:
   CI:
@@ -27,7 +26,8 @@ jobs:
         run: ./scripts/ecp_build.sh
       - name: Build Provider
         run: |
-          OPENSSL_ROOT_DIR="$(brew --prefix openssl@3.0)" cmake -S ecp-provider -B build && cmake --build build && scp build/libecp_provider.dylib $ECP_BIN_DIR
+          OPENSSL_ROOT_DIR="$(brew --prefix openssl@3.0)" cmake -S ecp-provider -B build && cmake --build build && \
+            install_name_tool -change libecp.dylib @loader_path/libecp.dylib build/libecp_provider.dylib && scp build/libecp_provider.dylib $ECP_BIN_DIR
       - name: Set up credentials
         run: |
           export OPENSSL_CLI="$(brew --prefix openssl@3.0)/bin/openssl"
