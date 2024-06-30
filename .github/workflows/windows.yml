@@ -33,7 +33,7 @@ jobs:
           args: install openssl --version 3.1.1
       -
         name: Choco install dependencies
-        uses: crazy-max/ghaction-chocolatey@v2
+        uses: crazy-max/ghaction-chocolatey@v3
         with:
           args: install openssl cmake curl
       - name: Install ECP
