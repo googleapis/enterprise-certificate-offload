@@ -167,6 +167,7 @@ static int ecp_dig_sign_init(void *provctx, const char *mdname, void *provkey,
       ctx->digest_name_len = strlen(mdname) + 1;
       ctx->digest_name = (char *)malloc(sizeof(char) * ctx->digest_name_len);
       strncpy(ctx->digest_name, mdname, ctx->digest_name_len);
+      ctx->digest_name[ctx->digest_name_len] = '\0';
       return 1;
     }
   }
@@ -733,6 +734,7 @@ ECP_API int OSSL_provider_init(const OSSL_CORE_HANDLE *core,
     ctx->ecp_config_path =
         (char *)malloc(sizeof(char) * ctx->ecp_config_path_len);
     strncpy(ctx->ecp_config_path, config_path, ctx->ecp_config_path_len);
+    ctx->ecp_config_path[ctx->ecp_config_path_len] = '\0';
   }
 
   *out = ecp_prov_functions;
