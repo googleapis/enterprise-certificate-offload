@@ -19,7 +19,7 @@ jobs:
         with:
           go-version: 1.21
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
       - name: Install Dependencies
         run: brew update && brew install cmake perl make gcc curl openssl@3.0
       - name: Install ECP
