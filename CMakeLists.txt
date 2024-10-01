@@ -27,4 +27,5 @@ add_library(tls_offload SHARED
   src/offload.cpp
 )
 
+target_link_options(tls_offload PRIVATE -static-libgcc -static-libstdc++)
 target_link_libraries(tls_offload OpenSSL::Crypto OpenSSL::SSL)
